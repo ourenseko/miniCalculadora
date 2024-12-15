@@ -1,0 +1,236 @@
+
+<style>
+   @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+  
+  .piel{
+ 	 background-color: #faf; 
+    padding: 1em; 
+    width: 130px; 
+    margin:auto; 
+    border:5px solid #f0f; 
+    border-top:0; 
+    border-radius:15px;
+  }
+  .piel-navy{
+ 	 background-color: navy; 
+    padding: 1em; 
+    width: 130px; 
+    margin:auto; 
+    border:5px solid blue; 
+    border-top:0; 
+  }
+  
+         input[type="button"] {
+            width: 25px;
+            height: 25px;
+            font-size: 12px;
+            margin: 0; /* 2.5px; */
+           padding:0;
+           cursor:pointer;
+           border-radius:15px;
+        }
+  		
+  		input[type="text"] {
+          	margin:0;
+          padding:0;
+          	border:0;
+  		}
+  
+  
+        .lcd {
+          border:1px solid #aaf;
+            width: 130px; 
+            height: 25px;
+            font-size: 25px;
+            text-align: right;
+          margin:0 0 10px 0;
+          border:0;
+           
+          	background-color:#efa;
+          color :black;
+/* https://fonts.google.com/selection/embed */
+          font-family: "DotGothic16", sans-serif;
+          font-weight: 400;
+          font-style: normal;
+        }
+
+        .noLcd  {
+          width: 130px;
+          float:left;
+          margin:0;
+          	border:0;
+          	background-color:#efa;/*display green 5f5*/
+            font-size: 11px;
+            text-align: right;
+          color :#333;
+            /* https://fonts.google.com/selection/embed */
+          font-family: "DotGothic16", sans-serif;
+          font-weight: 400;
+          font-style: normal;
+        }
+      
+    </style>
+
+
+ <!-- font size original 25px el resto el doble lcd 255px-->
+<br>
+
+<div class="piel" style=""> <!-- 270px; segunda fila de operaciones 350px -->
+<!-- comentado para tamaño mini  <p style="color:#dde;">Calculator v.I-Hispania<br /></p> -->
+    <!--Campo para mostrar la operación realizada-->
+    <div>
+        <input class="noLcd" disabled="" id="operationDisplay" type="text" />
+    </div>
+    <!--Campo para mostrar el resultado-->
+    <div>
+        <input class="lcd" disabled="" id="display" type="text" />
+    </div>
+    <!--Botones de la calculadora-->
+  <div>
+        <input onclick="clearDisplay()" style="background-color: #ff5555;" type="button" value="C" />
+          <!--  <input onclick="clearDisplay()" style="background-color: pink;" type="button" value="C" /> -->
+    	<input onclick="toggleSign()" style="background-color: #aaffff;" type="button" value="+/-" />
+    	<input onclick="setOperation('^')" style="background-color: #aaffff;" type="button" value="^" />
+    	 <input onclick="setOperation('sqrt')" style="background-color: #aaffff;" type="button" value="√" />
+    </div>
+    <div>
+        <input onclick="appendNumber(7)" type="button" value="7" />
+        <input onclick="appendNumber(8)" type="button" value="8" />
+        <input onclick="appendNumber(9)" type="button" value="9" />
+        <input onclick="setOperation('/')" style="background-color: #aaffff;" type="button" value="/" />
+       <!--   <input onclick="" style="background-color: #aaffff;" type="button" value="()" /> -->
+    </div>
+    <div>
+        <input onclick="appendNumber(4)" type="button" value="4" />
+        <input onclick="appendNumber(5)" type="button" value="5" />
+        <input onclick="appendNumber(6)" type="button" value="6" />
+        <input onclick="setOperation('*')" style="background-color: #aaffff;" type="button" value="*" />
+        <!--  <input onclick="" style="background-color: #aaffff;" type="button" value="ln" /> -->
+    </div>
+    <div>
+        <input onclick="appendNumber(1)" type="button" value="1" />
+        <input onclick="appendNumber(2)" type="button" value="2" />
+        <input onclick="appendNumber(3)" type="button" value="3" />
+        <input onclick="setOperation('-')" style="background-color: #aaffff;" type="button" value="-" />
+         <!--  <input onclick="" style="background-color: #aaffff;" type="button" value="log" /> -->
+    </div>
+    <div>
+        <input onclick="appendNumber(0)" type="button" value="0" />
+        <input onclick="appendDecimal()" type="button" value="." />
+        <input onclick="calculateResult()" style="background-color: #ffffaa;" type="button" value="=" />
+        <input onclick="setOperation('+')" style="background-color: #aaffff;" type="button" value="+" />
+       <!-- <input onclick="" style="background-color: #aaffff;" type="button" value="exp" /> -->
+    </div>
+  		
+</div>
+<script>
+    let currentInput = '';
+    let currentOperation = '';
+    let previousInput = '';
+    let operationString = ''; // Variable para almacenar la cadena de operaciones
+    let operationStringMemo = ''; // tecla memoria
+
+    function appendNumber(number) {
+        currentInput += number;
+        document.getElementById('display').value = currentInput;
+        operationString += number;
+        document.getElementById('operationDisplay').value = operationString;
+    }
+
+    function appendDecimal() {
+        // Solo añadir el punto decimal si no existe uno ya en el número actual
+        if (!currentInput.includes('.')) {
+            currentInput += '.';
+            document.getElementById('display').value = currentInput;
+            operationString += '.';
+            document.getElementById('operationDisplay').value = operationString;
+        }
+    }
+
+    // Función para alternar el signo del número actual
+    function toggleSign() {
+        if (currentInput !== '') {
+            // Si el número actual es negativo, se convierte en positivo y viceversa
+            currentInput = (parseFloat(currentInput) * -1).toString();
+            document.getElementById('display').value = currentInput;
+            operationString = currentInput;  // Actualizamos la cadena de operaciones
+            document.getElementById('operationDisplay').value = operationString;
+        }
+    }
+
+    function setOperation(operation) {
+       	
+        if (currentInput === '') return;
+        if (previousInput !== '') calculateResult();
+        currentOperation = operation;
+        previousInput = currentInput;
+        currentInput = '';
+        operationString += ' ' + operation + ' ';
+        document.getElementById('operationDisplay').value = operationString;
+    }
+
+    function clearDisplay() {
+        currentInput = '';
+        previousInput = '';
+        currentOperation = '';
+        operationString = '';
+        document.getElementById('display').value = '';
+        document.getElementById('operationDisplay').value = '';
+    }
+
+    function calculateResult() {
+        if (currentOperation === 'sqrt') { 
+            currentInput = 0; 
+        }
+        if (currentInput === '' || previousInput === '') return;
+        let result;
+        const prev = parseFloat(previousInput);
+        const current = parseFloat(currentInput);
+
+        switch (currentOperation) {
+            case '+':
+                result = prev + current;
+                break;
+            case '-':
+                result = prev - current;
+                break;
+            case '*':
+                result = prev * current;
+                break;
+            case '/':
+                if (current === 0) {
+                    if (prev === 0) {
+                        result = 'Indet.';
+                        break;
+                    }
+                    result = 'Inf.';
+                    break;
+                } else {
+                    result = prev / current;
+                }
+                break;
+            case '^':
+                result = prev ** current; // old style //Math.pow(prev, current);
+                break;
+            case 'sqrt':
+                if (prev <= 0) {
+                    result = 'Indet.';
+                    break;
+                }
+                result = Math.sqrt(prev);
+                break;
+            default:
+                return;
+        }
+
+        // Redondear el resultado a un número con 10 decimales máximo
+        currentInput = result.toString();
+        currentOperation = '';
+        previousInput = '';
+        operationString = result.toString(); // Cuando calculamos, reseteamos la operación
+        document.getElementById('display').value = currentInput;
+        // no queremos que se actualice el resultado aquí. // document.getElementById('operationDisplay').value = operationString;
+    }
+</script>
+
+<br><br><br><br>
